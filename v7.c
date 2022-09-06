@@ -10,7 +10,7 @@ int main()
     // printf("\nDirectory: \n");
     // printf("\n--------------------------------------------------------------------\n");
 
-    display("E:\\", 0, 0);
+    display("E:\\file-system-using-c\\", 0, 0);
     return 0;
 }
 void display(char *path, int directory_count, int file_count)
