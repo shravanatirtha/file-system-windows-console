@@ -15,7 +15,10 @@
   "C_Cpp_Runner.warningsAsError": false,
   "C_Cpp_Runner.compilerArgs": [],
   "C_Cpp_Runner.linkerArgs": [],
-  "C_Cpp_Runner.includePaths": [],
+  "C_Cpp_Runner.includePaths": [
+    "C:\\Program Files\\Java\\jdk1.8.0_202\\include\\win32",
+    "C:\\Program Files\\Java\\jdk1.8.0_202\\include\\"
+  ],
   "C_Cpp_Runner.includeSearch": [
     "*",
     "**/*"
@@ -27,5 +30,15 @@
     "**/.*/**",
     "**/.vscode",
     "**/.vscode/**"
-  ]
+  ],
+  "java.settings.url": "C:/Program Files/Java/jdk1.8.0_202",
+  "launch": {
+    "configurations": [],
+    "compounds": []
+  },
+  "files.associations": {
+    "*.java": "java",
+    "*.js": "javascript",
+    "jni.h": "c"
+  }
 }

@@ -2,6 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "java",
+      "name": "Launch Test",
+      "request": "launch",
+      "mainClass": "Test",
+      "projectName": "file-system-using-c_e20b1fb3"
+    },
+    {
+      "type": "java",
+      "name": "Launch FileSystem",
+      "request": "launch",
+      "mainClass": "FileSystem",
+      "projectName": "file-system-using-c_e20b1fb3"
+    },
+    {
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",
