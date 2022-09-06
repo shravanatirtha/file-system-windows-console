@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     FileSystem
  * Method:    nativeMethod
- * Signature: ()V
+ * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_FileSystem_nativeMethod
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
 }
