@@ -7,7 +7,7 @@ This is a file system application built using C
 ```java 
 > javac -h . FileSystem.java 
 
-> gcc -I"C:\Program Files\Java\jdk1.8.0_202\include"  I"C:\Program Files\Java\jdk1.8.0_202\include\win32" -shared -o FileSys.dll FileSystem.c
+> gcc -I"C:\Program Files\Java\jdk1.8.0_202\include" -I"C:\Program Files\Java\jdk1.8.0_202\include\win32" -shared -o FileSys.dll FileSystem.c
 
 > java FileSystem
 ```
