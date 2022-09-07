@@ -82,7 +82,23 @@ void display(char *path, int directory_count, int file_count, int file_size)
     printf("Maps to: %s\n", path);
     printf("Directories:  %d \n", directory_count);
     printf("Files:  %d \n", file_count);
-    printf("Total size:  %d bytes\n", file_size);
+    if (file_size <= 1024)
+    {
+        printf("Total size: %d bytes\n", file_size);
+    }
+    else if (file_size > 1024 && file_size <= 1048576)
+    {
+        printf("Total size: %d KB\n", file_size / 1024);
+    }
+    else if (file_size > 1048576 && file_size <= 1073741824)
+    {
+        printf("Total size: %d MB\n", file_size / 1048576);
+    }
+    else if (file_size > 1073741824)
+    {
+        printf("Total size: %d GB\n", file_size / 1073741824);
+    }
+
     FindClose(path_handle);
 
     printf("\n--------------------------------------------------------------------\n");
