@@ -40,5 +40,9 @@
     "*.java": "java",
     "*.js": "javascript",
     "jni.h": "c"
-  }
+  },
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "c:\\Users\\shravana-pt6102\\Downloads\\mysql-connector-java-8.0.30\\mysql-connector-java-8.0.30.jar"
+  ]
 }

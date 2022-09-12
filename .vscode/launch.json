@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Launch Insert",
+      "request": "launch",
+      "mainClass": "Insert",
+      "projectName": "file-system-using-c_e20b1fb3"
+    },
+    {
+      "type": "java",
       "name": "Launch Test",
       "request": "launch",
       "mainClass": "Test",
