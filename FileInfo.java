@@ -1,45 +1,46 @@
 public class FileInfo {
-    private String path;
-    private int subdirectories;
-    private int files;
-    private int size;
+    private String cFileName;
+    private int directory_count;
+    private int file_count;
+    private int nFileSizeLow;
 
-    public FileInfo(String path, int subdirectories, int files, int size) {
-        this.path = path;
-        this.subdirectories = subdirectories;
-        this.files = files;
-        this.size = size;
+    public FileInfo(String cFileName, int directory_count, int file_count, int nFileSizeLow) {
+        this.cFileName = cFileName;
+        this.directory_count = directory_count;
+        this.file_count = file_count;
+        this.nFileSizeLow = nFileSizeLow;
     }
 
-    public String getPath() {
-        return path;
+    public String getcFileName() {
+        return cFileName;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setcFileName(String cFileName) {
+        this.cFileName = cFileName;
     }
 
-    public int getSubdirectories() {
-        return subdirectories;
+    public int getDirectory_count() {
+        return directory_count;
     }
 
-    public void setSubdirectories(int subdirectories) {
-        this.subdirectories = subdirectories;
+    public void setDirectory_count(int directory_count) {
+        this.directory_count = directory_count;
     }
 
-    public int getFiles() {
-        return files;
+    public int getFile_count() {
+        return file_count;
     }
 
-    public void setFiles(int files) {
-        this.files = files;
+    public void setFile_count(int file_count) {
+        this.file_count = file_count;
     }
 
-    public int getSize() {
-        return size;
+    public int getnFileSizeLow() {
+        return nFileSizeLow;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setnFileSizeLow(int nFileSizeLow) {
+        this.nFileSizeLow = nFileSizeLow;
     }
+
 }
