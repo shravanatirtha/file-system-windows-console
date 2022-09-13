@@ -10,9 +10,9 @@ extern "C" {
 /*
  * Class:     FileSystem
  * Method:    fileSystem
- * Signature: (Ljava/lang/String;)V
+ * Signature: (Ljava/lang/String;)LFileInfo;
  */
-JNIEXPORT void JNICALL Java_FileSystem_fileSystem
+JNIEXPORT jobject JNICALL Java_FileSystem_fileSystem
   (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
