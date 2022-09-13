@@ -3,6 +3,29 @@
 // javac -h . FileSystem.java
 // gcc -I"C:\Program Files\Java\jdk1.8.0_202\include" -I"C:\Program Files\Java\jdk1.8.0_202\include\win32" -shared -o FileSys.dll FileSystem.c
 // java FileSystem
+
+/*
+ * 
+ * 1. Locate identifier of Long class with FindClass
+    2. Locate identifier of its constructor which accepts primitive type long with GetMethodID
+    3. Create new java Long object by passing irno as argument to its constructor with NewObjectA
+
+Other variables must be converted to their corresponding java types: c++ double to java Double, 
+c++ char[] to java String or to java char[] and so on.
+
+If you are going to pass a lot of such primitive objects to and from java, then I suggest that you
+ use some serialization library, such as google protobuf. You fill in protobuf message in java, 
+ serialize it into byte array and pass this byte array into java. In java, you deserialize it and 
+ get nice java object. When you need to add more fields, then you won't need 
+ to write any more error-prone JNI code.
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
 import java.util.*;
 // import java.sql.Connection;
 // import java.sql.DriverManager;
@@ -16,14 +39,19 @@ public class FileSystem {
         System.loadLibrary("FileSys");
     }
 
-    private native void fileSystem(String path);
+    private native FileInfo fileSystem(String path);
 
     public static void main(String[] args) {
         FileSystem fs = new FileSystem();
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter the path");
         String path = sc.nextLine();
-        fs.fileSystem(path);
+        FileInfo fi = fs.fileSystem(path);
+        System.out.println("File Name: " + fi.getcFileName());
+        System.out.println("Directory Count: " + fi.getDirectory_count());
+        System.out.println("File Count: " + fi.getFile_count());
+        System.out.println("File Size: " + fi.getnFileSizeLow());
+        // fs.fileSystem(path);
         // FileInfo fi = fs.fileSystem(path);
         // System.out.println("File Name: " + fi.getcFileName());
         // System.out.println("Directory Count: " + fi.getDirectory_count());
