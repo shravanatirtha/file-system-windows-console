@@ -57,8 +57,8 @@ public class FileSystem {
 
             FileSystem fs = new FileSystem();
             System.out.println("Enter the path");
-            String path = sc.nextLine();
-            path=path.toLowerCase();
+            String inputpath = sc.nextLine();
+            String path = inputpath.toLowerCase();
             FileInfo fi = fs.fileSystem(path);
             System.out.println("File Name: " + fi.getcFileName());
             System.out.println("Directory Count: " + fi.getDirectory_count());
@@ -90,6 +90,8 @@ public class FileSystem {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.out.println("Invalid Path");
         } finally {
             sc.close();
         }

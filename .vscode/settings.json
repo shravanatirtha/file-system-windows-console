@@ -31,7 +31,7 @@
     "**/.vscode",
     "**/.vscode/**"
   ],
-  "java.settings.url": "C:/Program Files/Java/jdk1.8.0_202",
+  "java.settings.url": "C:/Program Files/Java/jdk1.8.0_333",
   "launch": {
     "configurations": [],
     "compounds": []
@@ -43,6 +43,8 @@
   },
   "java.project.referencedLibraries": [
     "lib/**/*.jar",
-    "c:\\Users\\shravana-pt6102\\Downloads\\mysql-connector-java-8.0.30\\mysql-connector-java-8.0.30.jar"
-  ]
+    "c:\\Users\\shravana-pt6102\\Downloads\\mysql-connector-java-8.0.30\\mysql-connector-java-8.0.30.jar",
+    "c:\\Program Files\\Java\\jdk1.8.0_333\\lib\\mysql-connector-java-8.0.30.jar"
+  ],
+  "java.jdt.ls.java.home": ""
 }

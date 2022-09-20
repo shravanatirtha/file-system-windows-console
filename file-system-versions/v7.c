@@ -9,11 +9,28 @@ int main()
     printf("\n--------------------------------------------------------------------\n");
     // printf("\nDirectory: \n");
     // printf("\n--------------------------------------------------------------------\n");
-
-    display("E:\\file-system-using-c\\", 0, 0);
+    int size = 0;
+    size = display("c:\\users\\", 0, 0, 0);
+    if (size < 1024)
+    {
+        printf("\tSize: %d bytes\n", size);
+    }
+    else if (size < 1024 * 1024)
+    {
+        printf("\tSize: %d KB\n", size / 1024);
+    }
+    else if (size < 1024 * 1024 * 1024)
+    {
+        printf("\tSize: %d MB\n", size / (1024 * 1024));
+    }
+    else
+    {
+        printf("\tSize: %d GB\n", size / (1024 * 1024 * 1024));
+    }
+    printf("%d", size);
     return 0;
 }
-void display(char *path, int directory_count, int file_count)
+int display(char *path, int directory_count, int file_count, int size)
 {
     char file_path[1000];
     sprintf(file_path, "%s\\*.*", path);
@@ -21,7 +38,7 @@ void display(char *path, int directory_count, int file_count)
     WIN32_FIND_DATA data_file;
     if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
     {
-        printf("Cannot be accessed: [%s]\n", path);
+        //  printf("Cannot be accessed: [%s]\n", path);
     }
 
     while (FindNextFile(path_handle, &data_file))
@@ -31,21 +48,21 @@ void display(char *path, int directory_count, int file_count)
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                printf("\nDirectory Path: %d - %s\n", directory_count, file_path);
+                // printf("\nDirectory Path: %d - %s\n", directory_count, file_path);
                 directory_count++;
-                display(file_path, directory_count, file_count);
+                size=size+display(file_path, directory_count, file_count, size);
             }
             else
             {
                 // printf("File:  %d - %s\n", file_count, file_path);
                 file_count++;
+                size += data_file.nFileSizeLow;
+                // display(file_path, directory_count, file_count, size);
             }
         }
     }
-    printf("Maps to: %s\n", path);
-    printf("Directories:  %d \n", directory_count);
-    printf("Files:  %d \n", file_count);
-    FindClose(path_handle);
+    
 
-    printf("\n--------------------------------------------------------------------\n");
+    FindClose(path_handle);
+    return size;
 }

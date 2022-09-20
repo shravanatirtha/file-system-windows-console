@@ -1,4 +1,4 @@
-/*This program prints the files names of the directory given by user recursively*/
+/*This program prints the files names of the directory given by user recursively with the path and number of files and directories in it*/
 #include <stdio.h>
 #include <dirent.h>
 #include <windows.h>
@@ -10,11 +10,29 @@ int main()
     // int directory_count = 1;
     // int file_count = 1;
     // display("E:\\", directory_count, file_count);
+    printf("\n--------------------------------------------------------------------\n");
     printf("\nFile system information\n");
-     display("E:\\", 1, 1);
+    printf("\n--------------------------------------------------------------------\n");
+    int size = display("E:\\file-system-using-c\\", 0, 0, 0);
+    if (size < 1024)
+    {
+        printf("\tSize: %d bytes\n", size);
+    }
+    else if (size < 1024 * 1024)
+    {
+        printf("\tSize: %d KB\n", size / 1024);
+    }
+    else if (size < 1024 * 1024 * 1024)
+    {
+        printf("\tSize: %d MB\n", size / (1024 * 1024));
+    }
+    else
+    {
+        printf("\tSize: %d GB\n", size / (1024 * 1024 * 1024));
+    }
     return 0;
 }
-void display(char *path, int directory_count, int file_count)
+int display(char *path, int directory_count, int file_count, int size)
 {
     char file_path[1000];
     sprintf(file_path, "%s\\*.*", path);
@@ -22,7 +40,7 @@ void display(char *path, int directory_count, int file_count)
     WIN32_FIND_DATA data_file;
     if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
     {
-        printf("Path not found: [%s]\n", path);
+        int x = 0;
     }
 
     while (FindNextFile(path_handle, &data_file))
@@ -32,19 +50,15 @@ void display(char *path, int directory_count, int file_count)
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                // printf("Directory: %d - %s\n", directory_count, file_path);
                 directory_count++;
-                display(file_path, directory_count, file_count);
+                return display(file_path, directory_count, file_count, size) + size;
             }
             else
             {
-                // printf("File:  %d - %s\n", file_count, file_path);
                 file_count++;
+                size += data_file.nFileSizeLow;
             }
         }
     }
-    printf("Directory:%s\n", file_path);
     FindClose(path_handle);
-    printf("Total directories: %d\t Total files: %d\n", directory_count, file_count);
-    
 }

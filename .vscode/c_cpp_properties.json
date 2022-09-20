@@ -4,8 +4,8 @@
             "name": "windows-gcc-x64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:\\Program Files\\Java\\jdk1.8.0_202\\include\\win32",
-                "C:\\Program Files\\Java\\jdk1.8.0_202\\include\\",
+                "C:\\Program Files\\Java\\jdk1.8.0_333\\include\\win32",
+                "C:\\Program Files\\Java\\jdk1.8.0_333\\include",
                 "C:\\Program Files\\MySQL\\MySQL Server 5.7\\include",
                 "C:\\Program Files\\MySQL\\MySQL Server 5.7\\lib"
             ],
