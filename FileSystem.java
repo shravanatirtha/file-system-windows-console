@@ -6,9 +6,9 @@
 
 /*
  * 
- * 1. Locate identifier of Long class with FindClass
-    2. Locate identifier of its constructor which accepts primitive type long with GetMethodID
-    3. Create new java Long object by passing irno as argument to its constructor with NewObjectA
+ * 1. Locate identifier of Integer class with FindClass
+    2. Locate identifier of its constructor which accepts primitive type Integer with GetMethodID
+    3. Create new java Integer object by passing irno as argument to its constructor with NewObjectA
 
 Other variables must be converted to their corresponding java types: c++ double to java Double, 
 c++ char[] to java String or to java char[] and so on.
@@ -60,31 +60,33 @@ public class FileSystem {
             String inputpath = sc.nextLine();
             String path = inputpath.toLowerCase();
             FileInfo fi = fs.fileSystem(path);
-            System.out.println("File Name: " + fi.getcFileName());
-            System.out.println("Directory Count: " + fi.getDirectory_count());
-            System.out.println("File Count: " + fi.getFile_count());
+            // System.out.println("File Name: " + fi.getcFileName());
+            // System.out.println("Directory Count: " + fi.getDirectory_count());
+            // System.out.println("File Count: " + fi.getFile_count());
             String size = "";
-            Long sizeInBytes = new Long(fi.getnFileSizeLow());
+            int sizeInBytes = fi.getnFileSizeLow();
             if (sizeInBytes < 1024) {
-                size = Long.toString(sizeInBytes) + " Bytes";
+                size = Integer.toString(sizeInBytes) + " Bytes";
             } else if (sizeInBytes >= 1024 && sizeInBytes < 1048576) {
-                size = Long.toString(sizeInBytes / 1024) + " KB";
+                size = Integer.toString(sizeInBytes / 1024) + " KB";
             } else if (sizeInBytes >= 1048576 && sizeInBytes < 1073741824) {
-                size = Long.toString(sizeInBytes / 1048576) + " MB";
+                size = Integer.toString(sizeInBytes / 1048576) + " MB";
             } else if (sizeInBytes >= 1073741824) {
-                size = Long.toString(sizeInBytes / 1073741824) + " GB";
+                size = Integer.toString(sizeInBytes / 1073741824) + " GB";
             }
-            System.out.println("File Size: " + size);
+            // System.out.println("File Size: " + size);
             Class.forName(jdbc_class);
             Connection con = DriverManager.getConnection(url, user, password);
             PreparedStatement stmt = con.prepareStatement("select * from directory WHERE path=?");
             stmt.setString(1, path);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
-                update(fi, size);
+                int version = getVersion(path);
+                update(fi, sizeInBytes, size, version + 1);
             } else {
 
-                insert(fi, size);
+                insert(fi, sizeInBytes, size);
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -97,17 +99,21 @@ public class FileSystem {
         }
     }
 
-    static void insert(FileInfo fi, String size) {
+    static void insert(FileInfo fi, int sizeInBytes, String size) {
         try {
             Class.forName(jdbc_class);
             Connection con = DriverManager.getConnection(url, user, password);
             PreparedStatement
 
-            stmt = con.prepareStatement("insert into directory values(?,?,?,?)");
+            stmt = con.prepareStatement("insert into directory values(?,?,?,?,?,?,?)");
             stmt.setString(1, fi.getcFileName());
             stmt.setInt(2, fi.getDirectory_count());
             stmt.setInt(3, fi.getFile_count());
             stmt.setString(4, size);
+            stmt.setInt(5, sizeInBytes);
+            stmt.setTimestamp(6, new java.sql.Timestamp(new java.util.Date().getTime()));
+            stmt.setInt(7, 1);
+
             stmt.executeUpdate();
 
             System.out.println("Directory inserted successfully");
@@ -120,16 +126,19 @@ public class FileSystem {
 
     }
 
-    static void update(FileInfo fi, String size) {
+    static void update(FileInfo fi, int sizeInBytes, String size, int version) {
         try {
             Class.forName(jdbc_class);
             Connection con = DriverManager.getConnection(url, user, password);
-            PreparedStatement stmt = con
-                    .prepareStatement("update directory set subdirectories=?,files=?,size=? where path=?;");
+            PreparedStatement stmt = con.prepareStatement("insert into directory values(?,?,?,?,?,?,?)");
             stmt.setString(1, fi.getcFileName());
             stmt.setInt(2, fi.getDirectory_count());
             stmt.setInt(3, fi.getFile_count());
             stmt.setString(4, size);
+            stmt.setInt(5, sizeInBytes);
+            stmt.setTimestamp(6, new java.sql.Timestamp(new java.util.Date().getTime()));
+            stmt.setInt(7, version);
+
             stmt.executeUpdate();
             System.out.println("Data updated successfully");
         } catch (ClassNotFoundException e) {
@@ -137,6 +146,26 @@ public class FileSystem {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    static int getVersion(String path) {
+        int version = 0;
+        try {
+            Class.forName(jdbc_class);
+            Connection con = DriverManager.getConnection(url, user, password);
+            PreparedStatement stmt = con.prepareStatement("select count(*) from directory where path=?");
+            stmt.setString(1, path);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                version=rs.getInt(1);
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return version;
     }
 }
 
