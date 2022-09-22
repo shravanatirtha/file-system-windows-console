@@ -1,7 +1,7 @@
 
 // Steps to execute
 // javac -h . FileSystem.java
-// gcc -I"C:\Program Files\Java\jdk1.8.0_333\include" -I"C:\Program Files\Java\jdk1.8.0_333\include\win32" -shared -o FileSys.dll FileSystem.c
+// gcc -I"C:\Program Files\Java\jdk1.8.0_333\include" -I"C:\Program Files\Java\jdk1.8.0_333\include\win32" -shared -o FileSyst.dll FileSystem.c
 // java FileSystem
 
 /*
@@ -37,7 +37,7 @@ import java.util.Scanner;
 public class FileSystem {
     // load library path of dll
     static {
-        System.loadLibrary("FileSys");
+        System.loadLibrary("FileSyst");
     }
 
     // native method
@@ -59,10 +59,8 @@ public class FileSystem {
             System.out.println("Enter the path");
             String inputpath = sc.nextLine();
             String path = inputpath.toLowerCase();
+            // calling native method
             FileInfo fi = fs.fileSystem(path);
-            // System.out.println("File Name: " + fi.getcFileName());
-            // System.out.println("Directory Count: " + fi.getDirectory_count());
-            // System.out.println("File Count: " + fi.getFile_count());
             String size = "";
             int sizeInBytes = fi.getnFileSizeLow();
             if (sizeInBytes < 1024) {
