@@ -1,45 +1,172 @@
-#include "C:/Program Files/Java/jdk1.8.0_202/include/jni.h"
-#include "C:/Program Files/Java/jdk1.8.0_202/include/win32/jni_md.h"
+/*This program prints names of the directory given by user recursively*/
 #include <stdio.h>
-#include "FileSystem.h"
-#include <windows.h>
 #include <dirent.h>
-JNIEXPORT void JNICALL Java_FileSystem_fileSystem(JNIEnv *env, jobject clsobj, jstring path)
+#include <windows.h>
+// void path_array(char *files);
+int main()
 {
-    int directoryCount = 0;
-    int fileCount = 0;
-    int totalSize = 0;
-    const char *pathName = (*env)->GetStringUTFChars(env, path, NULL);
-    char file_path[1000];
-    sprintf(file_path, "%s\\*.*", pathName);
-    HANDLE path_handle = NULL;
-    WIN32_FIND_DATA data_file;
-    if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
-    {
-        printf("Cannot be accessed: [%s]\n", pathName);
-        return;
-    }
+    printf("\n--------------------------------------------------------------------\n");
+    printf("\nFile system information\n");
+    printf("\n--------------------------------------------------------------------\n");
 
-    while (FindNextFile(path_handle, &data_file))
+    int size = 0;
+    size = path_size("E:\\", 0);
+    if (size < 1024)
     {
-        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+        printf("\tSize: %d bytes\n", size);
+    }
+    else if (size < 1024 * 1024)
+    {
+        printf("\tSize: %d KB\n", size / 1024);
+    }
+    else if (size < 1024 * 1024 * 1024)
+    {
+        printf("\tSize: %d MB\n", size / (1024 * 1024));
+    }
+    else
+    {
+        printf("\tSize: %d GB\n", size / (1024 * 1024 * 1024));
+    }
+    int file_count = 0;
+    file_count = files("E:\\", 0);
+    printf("\tNumber of files: %d\n", file_count);
+    int dir_count = 0;
+    dir_count = directories("E:\\", 0);
+    printf("\tNumber of directories: %d\n", dir_count);
+    char **str = path_array("E:\\", dir_count);
+    for (int i = 0; i < dir_count; i++)
+    {
+        printf("%s\n", str[i]);
+    }
+    return 0;
+}
+
+    int path_size(char *path, int size)
+    {
+        char file_path[1000];
+        sprintf(file_path, "%s\\*.*", path);
+        HANDLE path_handle = NULL;
+        WIN32_FIND_DATA data_file;
+        if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
         {
-            sprintf(file_path, "%s\\%s", path, data_file.cFileName);
-            if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            // printf("Cannot be accessed: [%s]\n", path);
+        }
+
+        while (FindNextFile(path_handle, &data_file))
+        {
+            if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
             {
-                directoryCount++;
-            }
-            else
-            {
-                fileCount++;
-                totalSize += data_file.nFileSizeLow;
+                sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+                if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                {
+
+                    size = size + path_size(file_path, size);
+                }
+                else
+                {
+
+                    size += data_file.nFileSizeLow;
+                }
             }
         }
+
+        FindClose(path_handle);
+        if (size < 0)
+            size = abs(size);
+        return size;
     }
-    printf("path: %s\n", pathName);
-    printf("directoryCount: %d\n", directoryCount);
-    printf("fileCount: %d\n", fileCount);
-    printf("totalSize: %d\n", totalSize);
-    FindClose(path_handle);
-    (*env)->ReleaseStringUTFChars(env, path, pathName);
-}
+
+    int files(char *path, int file_count)
+    {
+        char file_path[1000];
+        sprintf(file_path, "%s\\*.*", path);
+        HANDLE path_handle = NULL;
+        WIN32_FIND_DATA data_file;
+        if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
+        {
+            // printf("Cannot be accessed: [%s]\n", path);
+        }
+
+        while (FindNextFile(path_handle, &data_file))
+        {
+            if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+            {
+                sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+                if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                {
+                    file_count = files(file_path, file_count);
+                }
+                else
+                {
+                    file_count++;
+                }
+            }
+        }
+
+        FindClose(path_handle);
+        return file_count;
+    }
+
+    int directories(char *path, int directory_count)
+    {
+        char file_path[1000];
+        sprintf(file_path, "%s\\*.*", path);
+        HANDLE path_handle = NULL;
+        WIN32_FIND_DATA data_file;
+        if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
+        {
+            // printf("Cannot be accessed: [%s]\n", path);
+        }
+
+        while (FindNextFile(path_handle, &data_file))
+        {
+            if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+            {
+                sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+                if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                {
+
+                    directory_count = directories(file_path, directory_count);
+                    directory_count++;
+                }
+                else
+                {
+                }
+            }
+        }
+        FindClose(path_handle);
+        return directory_count;
+    }
+
+    char **path_array(char *path, int dir_count)
+    {
+        char file_path[1000];
+        sprintf(file_path, "%s\\*.*", path);
+        HANDLE path_handle = NULL;
+        WIN32_FIND_DATA data_file;
+        if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
+        {
+            // printf("Cannot be accessed: [%s]\n", path);
+        }
+        char **str = (char **)malloc(dir_count * sizeof(char *));
+        int i = 0;
+        while (FindNextFile(path_handle, &data_file))
+        {
+            if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+            {
+                sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+                if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                {
+                    str[i] = (char *)malloc(1000 * sizeof(char));
+                    strcpy(str[i], file_path);
+                    i++;
+                    // str[i] = (char *)malloc(1000 * sizeof(char));
+                    // strcpy(str[i], file_path);
+                    // i++;
+                    
+                }
+            }
+        }
+        FindClose(path_handle);
+        return str;
+    }
