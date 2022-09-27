@@ -25,10 +25,10 @@ int main()
         printf("\tSize: %d GB\n", size / (1024 * 1024 * 1024));
     }
     int file_count = 0;
-    file_count = files("E:\\file-system-using-c", 0);
+    file_count = files("E:\\", 0);
     printf("\tNumber of files: %d\n", file_count);
     int dir_count = 0;
-    dir_count = directories("E:\\file-system-using-c", 0);
+    dir_count = directories("E:\\", 0);
     printf("\tNumber of directories: %d\n", dir_count);
     return 0;
 }

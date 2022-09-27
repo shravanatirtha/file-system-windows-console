@@ -29,27 +29,22 @@ void display(char *path, int directory_count, int file_count)
 
     while (FindNextFile(path_handle, &data_file))
     {
-        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0))
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
         {
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                // printf("Directory: %d - %s\n", directory_count, file_path);
+                printf("Directory: %d - %s\n", directory_count, file_path);
                 directory_count++;
                 display(file_path, directory_count, file_count);
+                
             }
             else
             {
                 // printf("File:  %d - %s\n", file_count, file_path);
                 file_count++;
             }
-            printf("Path: %s\n\n", file_path);
-            printf("Total directories: %d\t | \tTotal files: %d\n", directory_count, file_count);
-            printf("\n--------------------------------------------------------------------\n");
         }
     }
-    // printf("Directory: %s\n\n", file_path);
     FindClose(path_handle);
-    // printf("Total directories: %d\t | \tTotal files: %d\n", directory_count, file_count);
-    // printf("\n--------------------------------------------------------------------\n");
 }

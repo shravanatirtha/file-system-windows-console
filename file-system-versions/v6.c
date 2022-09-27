@@ -2,16 +2,22 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <windows.h>
-// void display(char *files);
+char **path_array(char *path, int i, char **ref);
 int main()
 {
-    printf("\n--------------------------------------------------------------------\n");
+    printf("\n-------------------------------------------\n");
     printf("\nFile system information\n");
-    printf("\n--------------------------------------------------------------------\n");
-    display("E:\\", 1, 1);
+    printf("\n--------------------------------------------\n");
+    char **str = (char **)malloc(sizeof(char *) * 29);
+    char **ref = (char **)malloc(sizeof(char *) * 29);
+    str = path_array("E:", 0, ref);
+    for (int i = 0; i < 29; i++)
+    {
+        printf("%d\t%s\n", i, str[i]);
+    }
     return 0;
 }
-void display(char *path, int directory_count, int file_count)
+char **path_array(char *path, int i, char **ref)
 {
     char file_path[1000];
     sprintf(file_path, "%s\\*.*", path);
@@ -24,25 +30,28 @@ void display(char *path, int directory_count, int file_count)
 
     while (FindNextFile(path_handle, &data_file))
     {
-        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0))
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
         {
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                printf("Directory: %d - %s\n", directory_count, file_path);
-                directory_count++;
-                display(file_path, directory_count, file_count);
+
+                // printf("Directory: - %s\n", file_path);
+                ref[i] = (char *)malloc(1000 * sizeof(char));
+                strcpy(ref[i], file_path);
+                i++;
+                path_array(file_path, i, ref);
             }
-            else
-            {
-                // printf("File:  %d - %s\n", file_count, file_path);
-                file_count++;
-            }
-            printf("Files:  %d\n", file_count);
+            //     else
+            //     {
+            //         printf("File:  %d - %s\n", file_count, file_path);
+            //         file_count++;
+            //     }
+            //    printf("Files:  %d\n", file_count);
         }
     }
-    
-    printf("\n--------------------------------------------------------------------\n");
 
+    // printf("\n--------------------------------------------------------------------\n");
     FindClose(path_handle);
+    return ref;
 }

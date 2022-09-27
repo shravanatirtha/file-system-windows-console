@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <windows.h>
-// void path_array(char *files);
+char **path_array(char *path, int dir_count, int i);
+int path_size(char *path, int size);
+int files(char *path, int file_count);
+int directories(char *path, int directory_count);
 int main()
 {
     printf("\n--------------------------------------------------------------------\n");
@@ -33,140 +36,140 @@ int main()
     int dir_count = 0;
     dir_count = directories("E:\\", 0);
     printf("\tNumber of directories: %d\n", dir_count);
-    char **str = path_array("E:\\", dir_count);
-    for (int i = 0; i < dir_count; i++)
-    {
-        printf("%s\n", str[i]);
-    }
+    char **str = (char **)malloc(sizeof(char *) * dir_count);
+    str = path_array("E:\\", dir_count,0);
+    // for (int i = 0; i < dir_count; i++)
+    // {
+    //     printf("%d\t%s\n", i, str[i]);
+    // }
     return 0;
 }
 
-    int path_size(char *path, int size)
+int path_size(char *path, int size)
+{
+    char file_path[1000];
+    sprintf(file_path, "%s\\*.*", path);
+    HANDLE path_handle = NULL;
+    WIN32_FIND_DATA data_file;
+    if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
     {
-        char file_path[1000];
-        sprintf(file_path, "%s\\*.*", path);
-        HANDLE path_handle = NULL;
-        WIN32_FIND_DATA data_file;
-        if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
-        {
-            // printf("Cannot be accessed: [%s]\n", path);
-        }
-
-        while (FindNextFile(path_handle, &data_file))
-        {
-            if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
-            {
-                sprintf(file_path, "%s\\%s", path, data_file.cFileName);
-                if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-
-                    size = size + path_size(file_path, size);
-                }
-                else
-                {
-
-                    size += data_file.nFileSizeLow;
-                }
-            }
-        }
-
-        FindClose(path_handle);
-        if (size < 0)
-            size = abs(size);
-        return size;
+        // printf("Cannot be accessed: [%s]\n", path);
     }
 
-    int files(char *path, int file_count)
+    while (FindNextFile(path_handle, &data_file))
     {
-        char file_path[1000];
-        sprintf(file_path, "%s\\*.*", path);
-        HANDLE path_handle = NULL;
-        WIN32_FIND_DATA data_file;
-        if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
         {
-            // printf("Cannot be accessed: [%s]\n", path);
-        }
-
-        while (FindNextFile(path_handle, &data_file))
-        {
-            if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+            sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+            if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                sprintf(file_path, "%s\\%s", path, data_file.cFileName);
-                if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-                    file_count = files(file_path, file_count);
-                }
-                else
-                {
-                    file_count++;
-                }
+
+                size = size + path_size(file_path, size);
+            }
+            else
+            {
+
+                size += data_file.nFileSizeLow;
             }
         }
-
-        FindClose(path_handle);
-        return file_count;
     }
 
-    int directories(char *path, int directory_count)
+    FindClose(path_handle);
+    if (size < 0)
+        size = abs(size);
+    return size;
+}
+
+int files(char *path, int file_count)
+{
+    char file_path[1000];
+    sprintf(file_path, "%s\\*.*", path);
+    HANDLE path_handle = NULL;
+    WIN32_FIND_DATA data_file;
+    if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
     {
-        char file_path[1000];
-        sprintf(file_path, "%s\\*.*", path);
-        HANDLE path_handle = NULL;
-        WIN32_FIND_DATA data_file;
-        if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
-        {
-            // printf("Cannot be accessed: [%s]\n", path);
-        }
+        // printf("Cannot be accessed: [%s]\n", path);
+    }
 
-        while (FindNextFile(path_handle, &data_file))
+    while (FindNextFile(path_handle, &data_file))
+    {
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
         {
-            if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+            sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+            if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                sprintf(file_path, "%s\\%s", path, data_file.cFileName);
-                if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-
-                    directory_count = directories(file_path, directory_count);
-                    directory_count++;
-                }
-                else
-                {
-                }
+                file_count = files(file_path, file_count);
+            }
+            else
+            {
+                file_count++;
             }
         }
-        FindClose(path_handle);
-        return directory_count;
     }
 
-    char **path_array(char *path, int dir_count)
+    FindClose(path_handle);
+    return file_count;
+}
+
+int directories(char *path, int directory_count)
+{
+    char file_path[1000];
+    sprintf(file_path, "%s\\*.*", path);
+    HANDLE path_handle = NULL;
+    WIN32_FIND_DATA data_file;
+    if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
     {
-        char file_path[1000];
-        sprintf(file_path, "%s\\*.*", path);
-        HANDLE path_handle = NULL;
-        WIN32_FIND_DATA data_file;
-        if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
+        // printf("Cannot be accessed: [%s]\n", path);
+    }
+
+    while (FindNextFile(path_handle, &data_file))
+    {
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
         {
-            // printf("Cannot be accessed: [%s]\n", path);
-        }
-        char **str = (char **)malloc(dir_count * sizeof(char *));
-        int i = 0;
-        while (FindNextFile(path_handle, &data_file))
-        {
-            if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+            sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+            if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                sprintf(file_path, "%s\\%s", path, data_file.cFileName);
-                if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-                    str[i] = (char *)malloc(1000 * sizeof(char));
-                    strcpy(str[i], file_path);
-                    i++;
-                    // str[i] = (char *)malloc(1000 * sizeof(char));
-                    // strcpy(str[i], file_path);
-                    // i++;
-                    
-                }
+
+                directory_count = directories(file_path, directory_count);
+                directory_count++;
+            }
+            else
+            {
             }
         }
-        FindClose(path_handle);
-        return str;
     }
+    FindClose(path_handle);
+    return directory_count;
+}
+
+char **path_array(char *path, int dir_count, int i)
+{
+    char file_path[1000];
+    sprintf(file_path, "%s\\*.*", path);
+    HANDLE path_handle = NULL;
+    WIN32_FIND_DATA data_file;
+    if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
+    {
+        // printf("Cannot be accessed: [%s]\n", path);
+    }
+    char **str = (char **)malloc(dir_count * sizeof(char *));
+    while (FindNextFile(path_handle, &data_file))
+    {
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+        {
+            sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+            if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            {
+                str[i] = (char *)malloc(1000 * sizeof(char));
+                strcpy(str[i], file_path);
+                i++;
+                // str[i] = (char *)malloc(1000 * sizeof(char));
+                // strcpy(str[i], file_path);
+                // i++;
+                // printf("%s\n", file_path);
+            }
+        }
+    }
+    FindClose(path_handle);
+    return str;
+}
