@@ -42,12 +42,7 @@ char **path_array(char *path, int i, char **ref)
                 i++;
                 path_array(file_path, i, ref);
             }
-            //     else
-            //     {
-            //         printf("File:  %d - %s\n", file_count, file_path);
-            //         file_count++;
-            //     }
-            //    printf("Files:  %d\n", file_count);
+
         }
     }
 
