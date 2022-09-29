@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT jobject JNICALL Java_FileSystem_fileSystem
   (JNIEnv *, jobject, jstring);
 
+/*
+ * Class:     FileSystem
+ * Method:    filePath
+ * Signature: (Ljava/lang/String;I)[Ljava/lang/String;
+ */
+JNIEXPORT jobjectArray JNICALL Java_FileSystem_filePath
+  (JNIEnv *, jobject, jstring, jint);
+
 #ifdef __cplusplus
 }
 #endif
