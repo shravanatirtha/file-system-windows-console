@@ -43,6 +43,8 @@ public class FileSystem {
     // native method
     private native FileInfo fileSystem(String path);
 
+    private native String[] filePath(String path, int dir_count);
+
     // jdbc connectivity variables
     private static String jdbc_class = "com.mysql.cj.jdbc.Driver";
     private static String url = "jdbc:mysql://localhost:3306/file_info";
@@ -61,30 +63,42 @@ public class FileSystem {
             String path = inputpath.toLowerCase();
             // calling native method
             FileInfo fi = fs.fileSystem(path);
-            String size = "";
-            int sizeInBytes = fi.getnFileSizeLow();
-            if (sizeInBytes < 1024) {
-                size = Integer.toString(sizeInBytes) + " Bytes";
-            } else if (sizeInBytes >= 1024 && sizeInBytes < 1048576) {
-                size = Integer.toString(sizeInBytes / 1024) + " KB";
-            } else if (sizeInBytes >= 1048576 && sizeInBytes < 1073741824) {
-                size = Integer.toString(sizeInBytes / 1048576) + " MB";
-            } else if (sizeInBytes >= 1073741824) {
-                size = Integer.toString(sizeInBytes / 1073741824) + " GB";
+            int n = fi.getDirectory_count();
+            System.out.println(n);
+            String[] paths = fs.filePath(path, n);
+            for (int i = 0; i < n; i++) {
+                System.out.println(i + " " + paths[i]);
             }
-            // System.out.println("File Size: " + size);
-            Class.forName(jdbc_class);
-            Connection con = DriverManager.getConnection(url, user, password);
-            PreparedStatement stmt = con.prepareStatement("select * from directory WHERE path=?");
-            stmt.setString(1, path);
-            ResultSet rs = stmt.executeQuery();
+            for (int i = 0; i < n; i++) {
+                if (paths[i] != null) {
+                    fi = fs.fileSystem(paths[i].toLowerCase());
+                    String size = "";
+                    int sizeInBytes = fi.getnFileSizeLow();
+                    if (sizeInBytes < 1024) {
+                        size = Integer.toString(sizeInBytes) + " Bytes";
+                    } else if (sizeInBytes >= 1024 && sizeInBytes < 1048576) {
+                        size = Integer.toString(sizeInBytes / 1024) + " KB";
+                    } else if (sizeInBytes >= 1048576 && sizeInBytes < 1073741824) {
+                        size = Integer.toString(sizeInBytes / 1048576) + " MB";
+                    } else if (sizeInBytes >= 1073741824) {
+                        size = Integer.toString(sizeInBytes / 1073741824) + " GB";
+                    }
+                    // System.out.println("File Size: " + size);
+                    Class.forName(jdbc_class);
+                    Connection con = DriverManager.getConnection(url, user, password);
+                    PreparedStatement stmt = con.prepareStatement("select * from directory WHERE path=?");
+                    stmt.setString(1, fi.getcFileName());
+                    ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                int version = getVersion(path);
-                update(fi, sizeInBytes, size, version + 1);
-            } else {
+                    if (rs.next()) {
+                        int version = getVersion(fi.getcFileName());
+                        update(fi, sizeInBytes, size, version + 1);
+                    } else {
 
-                insert(fi, sizeInBytes, size);
+                        insert(fi, sizeInBytes, size);
+                    }
+                    // n = fi.getDirectory_count();
+                }
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -101,9 +115,7 @@ public class FileSystem {
         try {
             Class.forName(jdbc_class);
             Connection con = DriverManager.getConnection(url, user, password);
-            PreparedStatement
-
-            stmt = con.prepareStatement("insert into directory values(?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into directory values(?,?,?,?,?,?,?)");
             stmt.setString(1, fi.getcFileName());
             stmt.setInt(2, fi.getDirectory_count());
             stmt.setInt(3, fi.getFile_count());
@@ -156,7 +168,8 @@ public class FileSystem {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                version=rs.getInt(1);
+                version = rs.getInt(1);
+                System.out.println(version);
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
