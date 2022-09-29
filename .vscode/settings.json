@@ -39,7 +39,20 @@
   "files.associations": {
     "*.java": "java",
     "*.js": "javascript",
-    "jni.h": "c"
+    "jni.h": "c",
+    "cmath": "c",
+    "compare": "c",
+    "limits": "c",
+    "*.tcc": "c",
+    "type_traits": "c",
+    "cctype": "c",
+    "concepts": "c",
+    "cstdarg": "c",
+    "cstdio": "c",
+    "cstdlib": "c",
+    "new": "c",
+    "cstdint": "c",
+    "typeinfo": "c"
   },
   "java.project.referencedLibraries": [
     "lib/**/*.jar",
