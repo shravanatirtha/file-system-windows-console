@@ -30,7 +30,63 @@
 #include "FileSystem.h"
 #include <windows.h>
 #include <dirent.h>
-JNIEXPORT jobject JNICALL Java_FileSystem_fileSystem(JNIEnv *env, jobject clsobj, jstring path)
+char **ref;
+int j = 0;
+void path_array(char *path);
+int path_size(char *path, int size);
+int files(char *path, int file_count);
+int directories(char *path, int directory_count);
+JNIEXPORT jobjectArray JNICALL Java_FileSystem_filePath(JNIEnv *env, jobject clsobj, jstring path, jint dir_count)
+{
+    const char *pathName = (*env)->GetStringUTFChars(env, path, NULL);
+    ref = (char **)malloc(sizeof(char *) * dir_count);
+    path_array(pathName);
+    jclass stringClass = (*env)->FindClass(env, "java/lang/String");
+    jobjectArray stringArray = (*env)->NewObjectArray(env, dir_count, stringClass, NULL);
+    for (int i = 0; i < dir_count; i++)
+    {
+        jstring string = (*env)->NewStringUTF(env, ref[i]);
+        (*env)->SetObjectArrayElement(env, stringArray, i, string);
+    }
+    return stringArray;
+    // jstring str;
+    // jobjectArray jstrArray = (*env)->NewObjectArray(env, dir_count, (*env)->FindClass(env, "java/lang/String"), 0);
+    // for (int i = 0; i < dir_count; i++)
+    // {
+    //     str = (*env)->NewStringUTF(env, ref[i]);
+    //     (*env)->SetObjectArrayElement(env, jstrArray, i, str);
+    // }
+    // return jstrArray;
+}
+
+void path_array(char *path)
+{
+    char file_path[1000];
+    sprintf(file_path, "%s\\*.*", path);
+    HANDLE path_handle = NULL;
+    WIN32_FIND_DATA data_file;
+    if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
+    {
+        // printf("Cannot be accessed: [%s]\n", path);
+    }
+    while (FindNextFile(path_handle, &data_file))
+    {
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+        {
+            sprintf(file_path, "%s\\%s", path, data_file.cFileName);
+            if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            {
+                ref[j] = (char *)malloc(1000 * sizeof(char));
+                strcpy(ref[j], file_path);
+                j++;
+                path_array(file_path);
+            }
+        }
+    }
+    FindClose(path_handle);
+}
+
+JNIEXPORT jobject JNICALL Java_FileSystem_fileSystem(JNIEnv *env, jobject clsobj, jobject path)
 {
     const char *pathName = (*env)->GetStringUTFChars(env, path, NULL);
     int directoryCount = directories(pathName, 0);
@@ -56,7 +112,7 @@ int path_size(char *path, int size)
 
     while (FindNextFile(path_handle, &data_file))
     {
-        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
         {
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -91,7 +147,7 @@ int files(char *path, int file_count)
 
     while (FindNextFile(path_handle, &data_file))
     {
-        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
         {
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -122,7 +178,7 @@ int directories(char *path, int directory_count)
 
     while (FindNextFile(path_handle, &data_file))
     {
-        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
+        if (strcmp(data_file.cFileName, ".") != 0 && strcmp(data_file.cFileName, "..") != 0 && strcmp(data_file.cFileName, ".metadata") != 0 && strcmp(data_file.cFileName, ".settings") != 0 && (strcmp(data_file.cFileName, ".git") != 0 && strcmp(data_file.cFileName, ".vscode") != 0) && (strcmp(data_file.cFileName, ".config") != 0 && strcmp(data_file.cFileName, "System Volume Information") != 0))
         {
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
