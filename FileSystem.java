@@ -32,7 +32,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
+import java.util.*;
 
 public class FileSystem {
     // load library path of dll
@@ -83,19 +83,26 @@ public class FileSystem {
                     } else if (sizeInBytes >= 1073741824) {
                         size = Integer.toString(sizeInBytes / 1073741824) + " GB";
                     }
-                    // System.out.println("File Size: " + size);
+                    int index = paths[i].lastIndexOf("\\");
+                    String dir_name = paths[i].substring(index + 1);
+                    String parent_path = paths[i].substring(0, index);
                     Class.forName(jdbc_class);
                     Connection con = DriverManager.getConnection(url, user, password);
-                    PreparedStatement stmt = con.prepareStatement("select * from directory WHERE path=?");
-                    stmt.setString(1, fi.getcFileName());
+                    PreparedStatement stmt = con.prepareStatement("select * from directory WHERE parent_path=?");
+                    stmt.setString(1, parent_path);
                     ResultSet rs = stmt.executeQuery();
-
+                    // String name = "";
+                    // if (paths[i].contains("\\")) {
+                    // List<String> list = Arrays.asList(paths[i].split("\\|"));
+                    // name = list.get(list.size() - 1);
+                    // } else {
+                    // name = paths[i];
+                    // }
                     if (rs.next()) {
-                        int version = getVersion(fi.getcFileName());
-                        update(fi, sizeInBytes, size, version + 1);
+                        int version = getVersion(path);
+                        update(parent_path, dir_name, fi, sizeInBytes, size, version + 1);
                     } else {
-
-                        insert(fi, sizeInBytes, size);
+                        insert(parent_path, dir_name, fi, sizeInBytes, size);
                     }
                     // n = fi.getDirectory_count();
                 }
@@ -111,19 +118,19 @@ public class FileSystem {
         }
     }
 
-    static void insert(FileInfo fi, int sizeInBytes, String size) {
+    static void insert(String path, String name, FileInfo fi, int sizeInBytes, String size) {
         try {
             Class.forName(jdbc_class);
             Connection con = DriverManager.getConnection(url, user, password);
-            PreparedStatement stmt = con.prepareStatement("insert into directory values(?,?,?,?,?,?,?)");
-            stmt.setString(1, fi.getcFileName());
-            stmt.setInt(2, fi.getDirectory_count());
-            stmt.setInt(3, fi.getFile_count());
-            stmt.setString(4, size);
-            stmt.setInt(5, sizeInBytes);
-            stmt.setTimestamp(6, new java.sql.Timestamp(new java.util.Date().getTime()));
-            stmt.setInt(7, 1);
-
+            PreparedStatement stmt = con.prepareStatement("insert into directory values(?,?,?,?,?,?,?,?)");
+            stmt.setString(1, path);
+            stmt.setString(2, name);
+            stmt.setInt(3, fi.getDirectory_count());
+            stmt.setInt(4, fi.getFile_count());
+            stmt.setString(5, size);
+            stmt.setInt(6, sizeInBytes);
+            stmt.setTimestamp(7, new java.sql.Timestamp(new java.util.Date().getTime()));
+            stmt.setInt(8, 1);
             stmt.executeUpdate();
 
             System.out.println("Directory inserted successfully");
@@ -136,18 +143,19 @@ public class FileSystem {
 
     }
 
-    static void update(FileInfo fi, int sizeInBytes, String size, int version) {
+    static void update(String path, String name, FileInfo fi, int sizeInBytes, String size, int version) {
         try {
             Class.forName(jdbc_class);
             Connection con = DriverManager.getConnection(url, user, password);
-            PreparedStatement stmt = con.prepareStatement("insert into directory values(?,?,?,?,?,?,?)");
-            stmt.setString(1, fi.getcFileName());
-            stmt.setInt(2, fi.getDirectory_count());
-            stmt.setInt(3, fi.getFile_count());
-            stmt.setString(4, size);
-            stmt.setInt(5, sizeInBytes);
-            stmt.setTimestamp(6, new java.sql.Timestamp(new java.util.Date().getTime()));
-            stmt.setInt(7, version);
+            PreparedStatement stmt = con.prepareStatement("insert into directory values(?,?,?,?,?,?,?,?)");
+            stmt.setString(1, path);
+            stmt.setString(2, name);
+            stmt.setInt(3, fi.getDirectory_count());
+            stmt.setInt(4, fi.getFile_count());
+            stmt.setString(5, size);
+            stmt.setInt(6, sizeInBytes);
+            stmt.setTimestamp(7, new java.sql.Timestamp(new java.util.Date().getTime()));
+            stmt.setInt(8, version);
 
             stmt.executeUpdate();
             System.out.println("Data updated successfully");
@@ -163,13 +171,13 @@ public class FileSystem {
         try {
             Class.forName(jdbc_class);
             Connection con = DriverManager.getConnection(url, user, password);
-            PreparedStatement stmt = con.prepareStatement("select count(*) from directory where path=?");
+            PreparedStatement stmt = con.prepareStatement("select count(*) from directory where parent_path=?");
             stmt.setString(1, path);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 version = rs.getInt(1);
-                System.out.println(version);
+                // System.out.println(version);
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
