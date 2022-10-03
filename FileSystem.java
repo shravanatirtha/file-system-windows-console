@@ -88,18 +88,14 @@ public class FileSystem {
                     String parent_path = paths[i].substring(0, index);
                     Class.forName(jdbc_class);
                     Connection con = DriverManager.getConnection(url, user, password);
-                    PreparedStatement stmt = con.prepareStatement("select * from directory WHERE parent_path=?");
+                    PreparedStatement stmt = con
+                            .prepareStatement("select * from directory WHERE parent_path=? and directory_name=?");
                     stmt.setString(1, parent_path);
+                    stmt.setString(2, dir_name);
+
                     ResultSet rs = stmt.executeQuery();
-                    // String name = "";
-                    // if (paths[i].contains("\\")) {
-                    // List<String> list = Arrays.asList(paths[i].split("\\|"));
-                    // name = list.get(list.size() - 1);
-                    // } else {
-                    // name = paths[i];
-                    // }
                     if (rs.next()) {
-                        int version = getVersion(path);
+                        int version = getVersion(parent_path, dir_name);
                         update(parent_path, dir_name, fi, sizeInBytes, size, version + 1);
                     } else {
                         insert(parent_path, dir_name, fi, sizeInBytes, size);
@@ -166,13 +162,15 @@ public class FileSystem {
         }
     }
 
-    static int getVersion(String path) {
+    static int getVersion(String path, String dir_name) {
         int version = 0;
         try {
             Class.forName(jdbc_class);
             Connection con = DriverManager.getConnection(url, user, password);
-            PreparedStatement stmt = con.prepareStatement("select count(*) from directory where parent_path=?");
+            PreparedStatement stmt = con
+                    .prepareStatement("select count(*) from directory where parent_path=? and directory_name=?");
             stmt.setString(1, path);
+            stmt.setString(2, dir_name);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
