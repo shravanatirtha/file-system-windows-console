@@ -152,10 +152,11 @@ int files(char *path, int file_count)
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                file_count = files(file_path, file_count);
+                
             }
             else
             {
+                file_count = files(file_path, file_count);
                 file_count++;
             }
         }
