@@ -101,6 +101,7 @@ public class FileSystem {
                         insert(parent_path, dir_name, fi, sizeInBytes, size);
                     }
                     // n = fi.getDirectory_count();
+                    con.close();
                 }
             }
         } catch (ClassNotFoundException e) {
@@ -111,6 +112,7 @@ public class FileSystem {
             System.out.println("Invalid Path");
         } finally {
             sc.close();
+
         }
     }
 
@@ -130,7 +132,7 @@ public class FileSystem {
             stmt.executeUpdate();
 
             System.out.println("Directory inserted successfully");
-
+            con.close();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -155,6 +157,7 @@ public class FileSystem {
 
             stmt.executeUpdate();
             System.out.println("Data updated successfully");
+            con.close();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -177,6 +180,7 @@ public class FileSystem {
                 version = rs.getInt(1);
                 // System.out.println(version);
             }
+            con.close();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
