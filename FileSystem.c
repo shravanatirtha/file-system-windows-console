@@ -30,6 +30,8 @@
 #include "FileSystem.h"
 #include <windows.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <time.h>
 char **ref;
 int j = 0;
 void path_array(char *path);
@@ -65,6 +67,12 @@ void path_array(char *path)
     sprintf(file_path, "%s\\*.*", path);
     HANDLE path_handle = NULL;
     WIN32_FIND_DATA data_file;
+    char s[1000];
+
+    time_t t = time(NULL);
+    struct tm *p = localtime(&t);
+
+    strftime(s, 1000, "%A, %B %d %Y", p);
     if ((path_handle = FindFirstFile(file_path, &data_file)) == INVALID_HANDLE_VALUE)
     {
         // printf("Cannot be accessed: [%s]\n", path);
@@ -79,6 +87,8 @@ void path_array(char *path)
                 ref[j] = (char *)malloc(1000 * sizeof(char));
                 strcpy(ref[j], file_path);
                 j++;
+                printf("%s\n", s);
+                //printf("time: %d\n", ctime(&data_file.ftLastWriteTime));
                 path_array(file_path);
             }
         }
@@ -152,7 +162,6 @@ int files(char *path, int file_count)
             sprintf(file_path, "%s\\%s", path, data_file.cFileName);
             if (data_file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
             {
-                
             }
             else
             {
